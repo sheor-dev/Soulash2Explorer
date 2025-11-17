@@ -116,6 +116,8 @@ public partial class HistoryViewer : PanelContainer
     DataBase.LoadedData.LoadAllDataFromSource("core_2");
     PortraitStorage.LoadTexture();
 
+    SkillList.InitializeSkillTags(DataBase.LoadedData.AllDataSkills.Count);
+
     save = new(Path.Combine(Paths.ConfiguredPaths.GameSavesPath, saveName));
 
     if (!save.LoadCompleteSave())

@@ -1,7 +1,8 @@
 using Godot;
 using SoulashSaveUtils.Types;
-using System;
 using System.Collections.Frozen;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 public partial class SkillList : GridContainer
@@ -9,41 +10,34 @@ public partial class SkillList : GridContainer
     [Export]
     public PackedScene SkillTagPackedScene;
 
-    private InstancePool<SkillTag> _instancePool;
+    private IReadOnlyCollection<SkillTag> _skillTags;
 
-    public override void _Ready()
+    public void InitializeSkillTags(int count)
     {
-        _instancePool = new InstancePool<SkillTag>(
-            // I generate 5 instances in advance because most actors I saw didn't have more than 5 skills
-            // Usually only player has a lot of skills, so potentially we could end-up with ~20 instances
-            Enumerable.Range(0, 5)
-                .Select((i) => SkillTagPackedScene.Instantiate<SkillTag>())
-                .ToArray(),
-            () => SkillTagPackedScene.Instantiate<SkillTag>());
+        _skillTags = Enumerable.Range(0, count)
+            .Select((i) => SkillTagPackedScene.Instantiate<SkillTag>())
+            .ToImmutableArray();
     }
 
     public void UpdateSkills(FrozenDictionary<string, Skill> skills)
     {
-        _instancePool.FreeAllInstances(instance =>
+        foreach (var child in GetChildren())
         {
-            if (IsAncestorOf(instance))
-            {
-                RemoveChild(instance);
-            }
-        });
+            RemoveChild(child);
+        }
 
         if (skills == null || skills.Count == 0)
         {
             return;
         }
 
-        foreach (var skill in skills)
+        foreach (var (skillTag, skill) in _skillTags
+            .Take(skills.Count)
+            .Select((skillTag, index) => (skillTag, skills.ElementAt(index).Value))
+        )
         {
-            var instance = _instancePool.GetInstance();
-
-            instance.UpdateSkill(skill.Value);
-
-            AddChild(instance);
+            skillTag.UpdateSkill(skill);
+            AddChild(skillTag);
         }
     }
 }

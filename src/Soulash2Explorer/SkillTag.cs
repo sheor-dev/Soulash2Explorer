@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Godot;
 using SoulashSaveUtils.Types;
 
+namespace Soulash2Explorer;
+
 public partial class SkillTag : PanelContainer
 {
     private const string UNKNOWN_COLOR_KEY = "UNKNOWN_COLOR";

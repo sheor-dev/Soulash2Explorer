@@ -4,6 +4,7 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+namespace Soulash2Explorer;
 
 public partial class SkillList : GridContainer
 {

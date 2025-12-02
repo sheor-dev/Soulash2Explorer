@@ -18,13 +18,20 @@ public partial class SkillList : GridContainer
         _skillTags = Enumerable.Range(0, count)
             .Select((i) => SkillTagPackedScene.Instantiate<SkillTag>())
             .ToImmutableArray();
+
+        foreach (var tag in _skillTags)
+        {
+            tag.Visible = false;
+            AddChild(tag);
+        }
     }
 
     public void UpdateSkills(FrozenDictionary<string, Skill> skills)
     {
         foreach (var child in GetChildren())
         {
-            RemoveChild(child);
+            if (child is SkillTag tag)
+                tag.Visible = false;
         }
 
         if (skills == null || skills.Count == 0)
@@ -38,7 +45,7 @@ public partial class SkillList : GridContainer
         )
         {
             skillTag.UpdateSkill(skill);
-            AddChild(skillTag);
+            skillTag.Visible = true;
         }
     }
 }

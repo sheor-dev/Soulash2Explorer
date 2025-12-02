@@ -8,53 +8,53 @@ namespace Soulash2Explorer;
 
 public partial class SkillTag : PanelContainer
 {
-    private const string UNKNOWN_COLOR_KEY = "UNKNOWN_COLOR";
+  private const string UNKNOWN_COLOR_KEY = "UNKNOWN_COLOR";
 
-    [Export]
-    public Label SkillNameLabel;
+  [Export]
+  public Label SkillNameLabel;
 
-    public void UpdateSkill(Skill skill)
+  public void UpdateSkill(Skill skill)
+  {
+    SkillNameLabel.Text = $"{skill.Name} {skill.CurrentLevel}/{skill.PotentialLevel}";
+
+    if (!_skillColorLookup.TryGetValue(skill.Id, out var baseColorHex))
     {
-        SkillNameLabel.Text = $"{skill.Name} {skill.CurrentLevel}/{skill.PotentialLevel}";
-
-        if (!_skillColorLookup.TryGetValue(skill.Id, out var baseColorHex))
-        {
-            baseColorHex = _skillColorLookup[UNKNOWN_COLOR_KEY];
-        }
-
-        var baseColor = new Color(baseColorHex);
-        var progressColor = GetProgressColor(baseColor);
-
-        if (Material is not ShaderMaterial material)
-        {
-            return;
-        }
-
-        float progress = skill.CurrentProgress == 0 || skill.ProgressToNextLevel == 0
-            ? 0
-            : skill.CurrentProgress / (float)skill.ProgressToNextLevel * 100;
-
-        material.SetShaderParameter("background_color", baseColor);
-        material.SetShaderParameter("progress_color", progressColor);
-        material.SetShaderParameter("progress", progress);
+      baseColorHex = _skillColorLookup[UNKNOWN_COLOR_KEY];
     }
 
-    // Get progress color by making base color slightly darker
-    private static Color GetProgressColor(Color baseColor)
+    var baseColor = new Color(baseColorHex);
+    var progressColor = GetProgressColor(baseColor);
+
+    if (Material is not ShaderMaterial material)
     {
-        return new Color(
-            baseColor with
-            {
-                R = baseColor.R * 0.7f,
-                G = baseColor.G * 0.7f,
-                B = baseColor.B * 0.7f,
-            }
-        );
+      return;
     }
 
-    private static readonly FrozenDictionary<string, string> _skillColorLookup
-        = new Dictionary<string, string>
+    float progress = skill.CurrentProgress == 0 || skill.ProgressToNextLevel == 0
+        ? 0
+        : skill.CurrentProgress / (float)skill.ProgressToNextLevel * 100;
+
+    material.SetShaderParameter("background_color", baseColor);
+    material.SetShaderParameter("progress_color", progressColor);
+    material.SetShaderParameter("progress", progress);
+  }
+
+  // Get progress color by making base color slightly darker
+  private static Color GetProgressColor(Color baseColor)
+  {
+    return new Color(
+        baseColor with
         {
+          R = baseColor.R * 0.7f,
+          G = baseColor.G * 0.7f,
+          B = baseColor.B * 0.7f,
+        }
+    );
+  }
+
+  private static readonly FrozenDictionary<string, string> _skillColorLookup
+      = new Dictionary<string, string>
+      {
             { UNKNOWN_COLOR_KEY, "#464645ff"},
             { "core_2_adventuring", "#c69a6b" },
             { "core_2_agriculture", "#8bb356" },
@@ -81,7 +81,7 @@ public partial class SkillTag : PanelContainer
             { "core_2_tailoring", "#d89c63" },
             { "core_2_thievery", "#b0a342" },
             { "core_2_weaponsmith", "#c47e55" },
-        }
-        .ToFrozenDictionary();
+      }
+      .ToFrozenDictionary();
 
 }
